@@ -1,4 +1,4 @@
-FILES = 
+FILES = src/mini_malloc.c
 
 TARGET = my_malloc
 
