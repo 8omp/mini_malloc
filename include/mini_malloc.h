@@ -3,7 +3,7 @@
 typedef struct block_meta
 {
 
-    int block_size;
+    size_t block_size;
     bool isfree;
     struct block_meta *next;
 
