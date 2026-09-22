@@ -3,6 +3,7 @@
 #include "../include/mini_malloc.h"
 
 #define METASIZE sizeof(META)
+static struct block_meta *global_head = NULL;
 
 struct block_meta *find_free_block(struct block_meta *head, size_t size)
 {
@@ -21,17 +22,10 @@ struct block_meta *find_free_block(struct block_meta *head, size_t size)
     return NULL;
 }
 
-struct block_meta *request_block(struct block_meta *head, size_t size)
-{
-    
-}
-
-void *mini_malloc(size_t size)
+void *request_block(struct block_meta *head, struct block_meta *tail, size_t size)
 {
     void *ptr = sbrk(0);
     void *req = sbrk(size + METASIZE);
-
-    META *head = NULL;
 
     if (req == (void *)-1)
     {
@@ -45,13 +39,24 @@ void *mini_malloc(size_t size)
             block->block_size = size;
             block->isfree = false;
 
-            head->next = block;
-            block->next = head;
+            if(tail != NULL){
+                tail->next = block;
+            }
+            block->next = NULL;
 
-            // METASIZE分、アドレスを進めたものを返すので +1だけ。 +METASIZEではない。
-            // return すると強制的に void *型になる
             return block + 1;
         }
+    }
+
+    return NULL;
+}
+
+void *mini_malloc(size_t size)
+{   
+    // First call
+    if(global_head == NULL){
+        global_head = (struct block_meta *)request_block(global_head, global_head, size);
+        return global_head;
     }
 
     // これ二度と忘れるなよ、未定義動作
