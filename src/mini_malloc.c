@@ -4,10 +4,34 @@
 
 #define METASIZE sizeof(META)
 
+struct block_meta *find_free_block(struct block_meta *head, size_t size)
+{
+    struct block_meta *current = head;
+
+    while (current != NULL)
+    {
+        if ((current->isfree == true) && (current->block_size >= size))
+        {
+            return current;
+        }
+
+        current = current->next;
+    }
+
+    return NULL;
+}
+
+struct block_meta *request_block(struct block_meta *head, size_t size)
+{
+    
+}
+
 void *mini_malloc(size_t size)
 {
     void *ptr = sbrk(0);
     void *req = sbrk(size + METASIZE);
+
+    META *head = NULL;
 
     if (req == (void *)-1)
     {
@@ -16,15 +40,17 @@ void *mini_malloc(size_t size)
     else
     {
         if (ptr == req)
-        {   
-            struct block_meta* true_req = (struct block_meta*) req;
-            true_req->block_size = size;
-            true_req->isfree = false;
-            true_req->next = NULL; //TODO: 多分ここ直さなあかん
+        {
+            struct block_meta *block = (struct block_meta *)req;
+            block->block_size = size;
+            block->isfree = false;
+
+            head->next = block;
+            block->next = head;
 
             // METASIZE分、アドレスを進めたものを返すので +1だけ。 +METASIZEではない。
             // return すると強制的に void *型になる
-            return true_req + 1;
+            return block + 1;
         }
     }
 
