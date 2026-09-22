@@ -13,7 +13,7 @@ struct block_meta *find_free_block(struct block_meta *head, size_t size)
     {
         if ((current->isfree == true) && (current->block_size >= size))
         {
-            return current + 1; // +1はMETASIZE分
+            return current;
         }
 
         current = current->next;
@@ -44,7 +44,7 @@ struct block_meta *request_block(struct block_meta *head, struct block_meta *tai
             }
             block->next = NULL;
 
-            return block + 1; // +1はMETASIZE分
+            return block;
         }
     }
 
