@@ -7,7 +7,7 @@ static struct block_meta *global_head = NULL;
 
 struct block_meta *find_free_block(struct block_meta *head, size_t size)
 {
-    struct block_meta *current = head;
+    struct block_meta *current = global_head;
 
     while (current != NULL)
     {
@@ -22,7 +22,7 @@ struct block_meta *find_free_block(struct block_meta *head, size_t size)
     return NULL;
 }
 
-struct block_meta *request_block(struct block_meta *head, struct block_meta *tail, size_t size)
+struct block_meta *add_new_block(struct block_meta *head, struct block_meta *tail, size_t size)
 {
     void *ptr = sbrk(0);
     void *req = sbrk(size + METASIZE);
@@ -39,7 +39,8 @@ struct block_meta *request_block(struct block_meta *head, struct block_meta *tai
             block->block_size = size;
             block->isfree = false;
 
-            if(tail != NULL){
+            if (tail != NULL)
+            {
                 tail->next = block;
             }
             block->next = NULL;
@@ -53,14 +54,26 @@ struct block_meta *request_block(struct block_meta *head, struct block_meta *tai
 
 void *mini_malloc(size_t size)
 {   
+    struct block_meta *block;
     // First call
-    if(global_head == NULL){
-        global_head = (struct block_meta *)request_block(global_head, global_head, size);
-        return global_head;
+    if (global_head == NULL)
+    {
+        block = (struct block_meta *)add_new_block(global_head, global_head, size);
+    }
+    else
+    {
+        block = find_free_block(global_head, size);
+        if (block != NULL)
+        {   
+            block->isfree = false;
+        }
+        else
+        {
+            block = add_new_block(global_head, , size);
+        }
     }
 
-    // これ二度と忘れるなよ、未定義動作
-    return NULL;
+    return block + 1;
 }
 
 void *mini_free(void *ptr)
