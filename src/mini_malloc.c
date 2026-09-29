@@ -5,7 +5,7 @@
 #define METASIZE sizeof(META)
 static struct block_meta *global_head = NULL;
 
-struct block_meta *find_free_block(struct block_meta *head, size_t size)
+struct block_meta *find_free_block(struct block_meta *tail, size_t size)
 {
     struct block_meta *current = global_head;
 
@@ -13,6 +13,7 @@ struct block_meta *find_free_block(struct block_meta *head, size_t size)
     {
         if ((current->isfree == true) && (current->block_size >= size))
         {
+            tail = current;
             return current;
         }
 
@@ -22,7 +23,7 @@ struct block_meta *find_free_block(struct block_meta *head, size_t size)
     return NULL;
 }
 
-struct block_meta *add_new_block(struct block_meta *head, struct block_meta *tail, size_t size)
+struct block_meta *add_new_block(struct block_meta *tail, size_t size)
 {
     void *ptr = sbrk(0);
     void *req = sbrk(size + METASIZE);
@@ -58,18 +59,20 @@ void *mini_malloc(size_t size)
     // First call
     if (global_head == NULL)
     {
-        block = (struct block_meta *)add_new_block(global_head, global_head, size);
+        block = (struct block_meta *)add_new_block(global_head, size);
+        global_head = block;
     }
     else
-    {
-        block = find_free_block(global_head, size);
+    {   
+        struct block_meta* tail = global_head;
+        block = find_free_block(tail, size); // TODO: tailはこれで伝えられているか？
         if (block != NULL)
         {   
             block->isfree = false;
         }
         else
         {
-            block = add_new_block(global_head, , size);
+            block = add_new_block(tail, size);
         }
     }
 
