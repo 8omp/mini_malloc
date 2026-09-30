@@ -5,15 +5,16 @@
 #define METASIZE sizeof(META)
 static struct block_meta *global_head = NULL;
 
-struct block_meta *find_free_block(struct block_meta *tail, size_t size)
+struct block_meta *find_free_block(struct block_meta **tail, size_t size)
 {
     struct block_meta *current = global_head;
 
     while (current != NULL)
-    {
+    {   
+        *tail = current;
+
         if ((current->isfree == true) && (current->block_size >= size))
         {
-            tail = current;
             return current;
         }
 
@@ -65,7 +66,7 @@ void *mini_malloc(size_t size)
     else
     {   
         struct block_meta* tail = global_head;
-        block = find_free_block(tail, size); // TODO: tailはこれで伝えられているか？
+        block = find_free_block(&tail, size); // TODO: tailはこれで伝えられているか？
         if (block != NULL)
         {   
             block->isfree = false;
