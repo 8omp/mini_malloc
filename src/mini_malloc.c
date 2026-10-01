@@ -80,7 +80,7 @@ void *mini_malloc(size_t size)
     return block + 1;
 }
 
-void *mini_free(void *ptr)
+void mini_free(void *ptr)
 {
     if(ptr == NULL){
         return;
