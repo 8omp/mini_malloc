@@ -82,4 +82,10 @@ void *mini_malloc(size_t size)
 
 void *mini_free(void *ptr)
 {
+    if(ptr == NULL){
+        return;
+    }else{
+        struct block_meta* block = (struct block_meta*)ptr - 1;
+        block->isfree = true;
+    }
 }
