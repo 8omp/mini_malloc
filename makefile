@@ -1,6 +1,6 @@
 FILES = ./src/main.c
 
-TARGET = my_malloc
+TARGET = mini_malloc
 
 CC = gcc
 CFLAGS = -g -Wall -I ./include/
