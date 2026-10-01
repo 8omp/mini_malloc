@@ -3,7 +3,7 @@ FILES = ./src/main.c
 TARGET = my_malloc
 
 CC = gcc
-CFLAGS = -Wall -I ./include/
+CFLAGS = -g -Wall -I ./include/
 
 SRCS = $(FILES) ./src/mini_malloc.c
 
